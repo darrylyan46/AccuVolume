@@ -71,8 +71,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private boolean mIsTangoServiceConnected;
     private boolean mIsProcessing = false;
 
-    ArrayList<vector> vectors = new ArrayList<vector>();
-    ArrayList<Double> magnitudes = new ArrayList<Double>();
+    final ArrayList<vector> vectors = new ArrayList<vector>();
+    final ArrayList<Double> magnitudes = new ArrayList<Double>();
     int index = 0;
 
     @Override
@@ -90,9 +90,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         //buttons!
         findViewById(R.id.Finish_Record).setOnClickListener(this);
         findViewById(R.id.total_length).setOnClickListener(this);
-        findViewById(R.id.total_area).setOnClickListener(this);
-        findViewById(R.id.total_volume).setOnClickListener(this);
+        findViewById(R.id.area).setOnClickListener(this);
+        findViewById(R.id.volume).setOnClickListener(this);
         findViewById(R.id.Record).setOnClickListener(this);
+        findViewById(R.id.Reset).setOnClickListener(this);
 
         // Instantiate Tango client
         mTango = new Tango(this);
@@ -169,12 +170,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     public void onClick(View v){
+        Log.i("click", "ENTERED");
         switch(v.getId()) {
             //adds a point when the button is pressed
             case R.id.Record:
                 index++;
                 vectors.add(new vector(a1, a2, a3));
                 PointsChosen = PointsChosen + "Vector" + index + ": " + vectors.get(index - 1).getX() + ", " + vectors.get(index - 1).getY() + ", " + vectors.get(index - 1).getZ() + "\n";
+                Log.i("click", "record");
                 break;
             //finishes the recording - Gets the length travelled
             case R.id.Finish_Record:
@@ -188,26 +191,30 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 Log.i("click", "length");
                 break;
             //Calculates the area
-            case R.id.total_area:
-                area = CalcArea(vectors, magnitudes);
+            case R.id.area:
                 Log.i("click", "area");
+                area = CalcArea(vectors, magnitudes);
                 break;
             //Calculates the volume
-            case R.id.total_volume:
-                volume = CalcVolume(vectors);
+            case R.id.volume:
                 Log.i("click", "volume");
+                volume = CalcVolume(vectors);
                 break;
+
             case R.id.Reset:
                 Log.i("click", "reset");
                 area = 0;
                 volume = 0;
+                index=0;
                 sums = 0;
-                magnitudes = new ArrayList<Double>();
-                vectors = new ArrayList<vector>();
+                magnitudes.clear();
+                vectors.clear();
                 PointsChosen = "";
                 takedata = true;
                 break;
-
+            default:
+                Log.i("click","clique");
+                break;
         }
     }
 
@@ -246,7 +253,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                                 (her - distance(q.get(0), q.get(r + 1))) * her - distance(q.get(r), q.get(r + 1))));
                     totalarea.add(area);
                 }
-                for (int x = 0; x < q.size(); x++) {
+                for (int x = 0; x < totalarea.size(); x++) {
                     sum = sum + totalarea.get(x);
                 }
                 area = sum;
@@ -258,27 +265,29 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     public double CalcVolume (ArrayList<vector> vectors){
         double xc = 0;
-        for(int i = 1; i == vectors.size(); i++){
+        for(int i = 0; i < vectors.size(); i++){
             xc = xc + vectors.get(i).getX();
+            System.out.println(vectors.get(i).getX());
         }
-        xc = xc/vectors.size();
+        double cx = xc/vectors.size();
+        System.out.println(cx + "did it work?");
         double yc = 0;
-        for(int j = 1; j == vectors.size(); j++){
+        for(int j = 0; j < vectors.size(); j++){
             yc = yc + vectors.get(j).getX();
         }
-        yc = yc/vectors.size();
+        double cy = yc/vectors.size();
         double zc = 0;
-        for(int k = 1; k == vectors.size(); k++){
+        for(int k = 0; k < vectors.size(); k++){
             zc = zc + vectors.get(k).getX();
         }
-        zc = zc/vectors.size();
+        double cz = zc/vectors.size();
         ArrayList<vector> cvectors = new ArrayList<vector>();
-        for(int i = 1; i == vectors.size(); i++) {
+        for(int i = 0; i < vectors.size(); i++) {
             vector cvector = new vector(xc-vectors.get(i).getX(),yc-vectors.get(i).getY(),zc-vectors.get(i).getZ());
             cvectors.add(i,cvector);
         }
         double totalmag = 0;
-        for(int i = 1; i == vectors.size(); i++) {
+        for(int i = 0; i < vectors.size(); i++) {
             totalmag = totalmag + cvectors.get(i).magnitude();
         }
         double r = totalmag/vectors.size();
@@ -313,7 +322,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             @Override
             public void onPoseAvailable(TangoPoseData pose) {
                 if (mIsProcessing) {
-                    Log.i(TAG, "Processing UI");
+                   // Log.i(TAG, "Processing UI");
                     return;
                 }
                 mIsProcessing = true;
@@ -337,7 +346,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
                 // Output to LogCat
                 String logMsg = translationMsg + " | " + rotationMsg;
-                Log.i(TAG, logMsg);
+               // Log.i(TAG, logMsg);
 
                 // Display data in TextViews. This must be done inside a
                 // runOnUiThread call because
