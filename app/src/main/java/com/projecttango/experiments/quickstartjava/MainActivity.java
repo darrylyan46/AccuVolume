@@ -209,9 +209,32 @@ public class MainActivity extends Activity implements View.OnClickListener {
         //calculate area
     }
 
-    public double CalcVolume (ArrayList<vector> vectors, ArrayList<Double> mag){
-        return 0;
-        //calculate volume
+    public double CalcVolume (ArrayList<vector> vectors){
+        double xc = 0;
+        for(int i = 1; i == vectors.size(); i++){
+            xc = xc + vectors.get(i).getX();
+        }
+        xc = xc/vectors.size();
+        double yc = 0;
+        for(int j = 1; j == vectors.size(); j++){
+            yc = yc + vectors.get(j).getX();
+        }
+        yc = yc/vectors.size();
+        double zc = 0;
+        for(int k = 1; k == vectors.size(); k++){
+            zc = zc + vectors.get(k).getX();
+        }
+        zc = zc/vectors.size();
+        ArrayList<vector> cvectors = new ArrayList<vector>();
+        for(int i = 1; i == vectors.size(); i++) {
+            cvectors.add(i,(xc-vectors.get(i).getX(),yc-vectors.get(i).getY(),zc-vectors.get(i).getZ()))
+        }
+        double totalmag = 0;
+        for(int i = 1; i == vectors.size(); i++) {
+            totalmag = totalmag + cvectors.get(i).magnitude();
+        }
+        double r = totalmag/vectors.size();
+        return ((8/(3*(Math.sqrt(3))))*r*r*r);
     }
 
     public double sumVectors(ArrayList<Double> mag){
