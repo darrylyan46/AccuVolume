@@ -36,5 +36,5 @@ if (project.hasProperty("Tango.catkin_devel_prefix")) {
 }
 
 dependencies {
-    compile fileTree(dir: external_lib_prefix + '/jar', include: ['**/*.jar'])
+    compile files('src/main/java/com/projecttango/experiments/quickstartjava/TangoReleaseLibs/jar/tango_java_lib.jar')
 }
