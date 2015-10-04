@@ -186,7 +186,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             //Calculates the area
             case R.id.total_area:
-                area = calculateArea(vectors);
+                area = CalcArea(vectors, magnitudes);
                 break;
             //Calculates the volume
             case R.id.total_volume:
@@ -204,7 +204,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
 
-        public double distance(vector a, vector b){
+        public double distance(vector a, vector b, vector c){
             double xy = Math.sqrt(Math.pow(a.getX() - b.getX(), 2) +
                     Math.pow(a.getY() - b.getY(), 2));
             double xz = Math.sqrt(Math.pow(a.getX() - b.getX(), 2) +
@@ -222,7 +222,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
 
 
-        public void calculateArea (ArrayList <vector> q){
+        public void CalcArea(ArrayList <vector> q, ArrayList <Double> p){
             double area;
             for (int i = 0; i < q.size(); i++) {
                 if (q.size() == 1) {
