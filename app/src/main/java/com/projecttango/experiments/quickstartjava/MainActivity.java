@@ -186,7 +186,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             //Calculates the area
             case R.id.total_area:
-                area = CalcArea(vectors, magnitudes);
+                area = calculateArea(vectors);
                 break;
             //Calculates the volume
             case R.id.total_volume:
@@ -204,10 +204,62 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    public double CalcArea (ArrayList<vector> vectors, ArrayList<Double> mag){
-        return 0;
-        //calculate area
-    }
+        public double distance(vector a, vector b){
+            double xy = Math.sqrt(Math.pow(a.getX() - b.getX(), 2) +
+                    Math.pow(a.getY() - b.getY(), 2));
+            double xz = Math.sqrt(Math.pow(a.getX() - b.getX(), 2) +
+                    Math.pow(a.getZ() - b.getZ(), 2));
+            double yz = Math.sqrt(Math.pow(a.getY() - b.getY(), 2) +
+                    Math.pow(a.getZ() - b.getZ(), 2));
+            if (xy > xz && xy > yz) {
+                return xy;
+            }
+            if (yz > xy && yz > xz) {
+                return yz;
+            } else {
+                return xz;
+            }
+        }
+
+
+        public void calculateArea (ArrayList <vector> q){
+            double area;
+            for (int i = 0; i < q.size(); i++) {
+                if (q.size() == 1) {
+                    area = 0;
+                }
+                if (q.size() == 2) {
+                    area = 0;
+                }
+                if (q.size() == 3) {
+                    double tot = distance(q.get(0), q.get(1)) + distance(q.get(1), q.get(2))
+                            + distance(q.get(0), q.get(2));
+                    double her = tot / 2;
+                    area = Math.sqrt(her * (her - distance(q.get(0), q.get(1))) *
+                            (her - distance(q.get(1), q.get(2))) * her - distance(q.get(0), q.get(2)));
+                } else {
+                    int num = q.size() - 2;
+                    double tot = 0;
+                    double sum = 0;
+                    ArrayList<Double> totalarea = new ArrayList<Double>();
+                    for (int r = 0; r < q.size(); i++) {
+                        tot = distance(q.get(0), q.get(1)) + distance(q.get(0), q.get(r = r + 1)) +
+                                distance(q.get(r), q.get(r + 1));
+                        double her = tot / 2;
+                        area = Math.sqrt(her * (her - distance(q.get(0), q.get(1)) *
+                                (her - distance(q.get(1), q.get(2))) * her - distance(q.get(0), q.get(2))));
+                        totalarea.add(area);
+                    }
+                    for (int x = 0; x < q.size(); i++) {
+                        sum = sum + totalarea.get(i);
+                    }
+
+
+                }
+
+            }
+        }
+
 
     public double CalcVolume (ArrayList<vector> vectors, ArrayList<Double> mag){
         return 0;
