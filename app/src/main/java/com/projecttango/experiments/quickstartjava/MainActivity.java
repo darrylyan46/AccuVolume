@@ -190,7 +190,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             //Calculates the volume
             case R.id.total_volume:
-                volume = CalcVolume(vectors, magnitudes);
+                volume = CalcVolume(vectors);
                 break;
             case R.id.Reset:
                 area = 0;
@@ -279,7 +279,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         zc = zc/vectors.size();
         ArrayList<vector> cvectors = new ArrayList<vector>();
         for(int i = 1; i == vectors.size(); i++) {
-            cvectors.add(i,(xc-vectors.get(i).getX(),yc-vectors.get(i).getY(),zc-vectors.get(i).getZ()))
+            vector cvector = new vector(xc-vectors.get(i).getX(),yc-vectors.get(i).getY(),zc-vectors.get(i).getZ());
+            cvectors.add(i,cvector);
         }
         double totalmag = 0;
         for(int i = 1; i == vectors.size(); i++) {
