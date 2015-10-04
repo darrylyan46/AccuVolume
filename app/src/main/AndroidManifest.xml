@@ -32,7 +32,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.projecttango.experiments.quickstartjava.MainActivity"
-            android:label="@string/app_name" >
+            android:label="AccuVolume" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
