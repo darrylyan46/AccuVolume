@@ -237,8 +237,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 double tot = distance(q.get(0), q.get(1)) + distance(q.get(1), q.get(2))
                             + distance(q.get(0), q.get(2));
                 double her = tot / 2;
-                area = Math.sqrt(her * (her - distance(q.get(0), q.get(1))) *
-                            (her - distance(q.get(1), q.get(2))) * her - distance(q.get(0), q.get(2)));
+                area = Math.sqrt(her * Math.abs((her - distance(q.get(0), q.get(1)))) *
+                            Math.abs((her - distance(q.get(1), q.get(2)))) * Math.abs(her - distance(q.get(0), q.get(2))));
+                Log.i("NaN", Double.toString(her));
+                Log.i("NaN", Double.toString(tot));
+                Log.i("NaN", Double.toString((her - distance(q.get(0), q.get(1)))));
+                Log.i("NaN", Double.toString((her - distance(q.get(1), q.get(2)))));
+                Log.i("NaN", Double.toString((her - distance(q.get(0), q.get(2)))));
             }
             else {
                 int num = q.size() - 2;
@@ -249,8 +254,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     tot = distance(q.get(0), q.get(r)) + distance(q.get(0), q.get(r + 1)) +
                             distance(q.get(r), q.get(r + 1));
                     double her = tot / 2;
-                    area = Math.sqrt(her * (her - distance(q.get(0), q.get(r)) *
-                                (her - distance(q.get(0), q.get(r + 1))) * her - distance(q.get(r), q.get(r + 1))));
+                    area = Math.sqrt(her * Math.abs((her - distance(q.get(0), q.get(r)))) *
+                                Math.abs((her - distance(q.get(0), q.get(r + 1)))) *Math.abs(her - distance(q.get(r), q.get(r + 1))));
                     totalarea.add(area);
                 }
                 for (int x = 0; x < totalarea.size(); x++) {
@@ -259,40 +264,45 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 area = sum;
             }
             Log.i(TAG, "Area");
-            return area;
+            return area*Math.pow(4/2.56/100,2);
         }
 
 
     public double CalcVolume (ArrayList<vector> vectors){
-        double xc = 0;
-        for(int i = 0; i < vectors.size(); i++){
-            xc = xc + vectors.get(i).getX();
-            System.out.println(vectors.get(i).getX());
+        if(vectors.size()<4){
+            return 0;
         }
-        double cx = xc/vectors.size();
-        System.out.println(cx + "did it work?");
-        double yc = 0;
-        for(int j = 0; j < vectors.size(); j++){
-            yc = yc + vectors.get(j).getX();
+        else {
+            double xc = 0;
+            for (int i = 0; i < vectors.size(); i++) {
+                xc = xc + vectors.get(i).getX();
+                System.out.println(vectors.get(i).getX());
+            }
+            double cx = xc / vectors.size();
+            System.out.println(cx + "did it work?");
+            double yc = 0;
+            for (int j = 0; j < vectors.size(); j++) {
+                yc = yc + vectors.get(j).getX();
+            }
+            double cy = yc / vectors.size();
+            double zc = 0;
+            for (int k = 0; k < vectors.size(); k++) {
+                zc = zc + vectors.get(k).getX();
+            }
+            double cz = zc / vectors.size();
+            ArrayList<vector> cvectors = new ArrayList<vector>();
+            for (int i = 0; i < vectors.size(); i++) {
+                vector cvector = new vector(xc - vectors.get(i).getX(), yc - vectors.get(i).getY(), zc - vectors.get(i).getZ());
+                cvectors.add(i, cvector);
+            }
+            double totalmag = 0;
+            for (int i = 0; i < vectors.size(); i++) {
+                totalmag = totalmag + cvectors.get(i).magnitude();
+            }
+            double r = totalmag / vectors.size();
+            Log.i(TAG, "volume");
+            return ((8 / (3 * (Math.sqrt(3)))) * r * r * r) * Math.pow(4 / 2.56 / 100, 3);
         }
-        double cy = yc/vectors.size();
-        double zc = 0;
-        for(int k = 0; k < vectors.size(); k++){
-            zc = zc + vectors.get(k).getX();
-        }
-        double cz = zc/vectors.size();
-        ArrayList<vector> cvectors = new ArrayList<vector>();
-        for(int i = 0; i < vectors.size(); i++) {
-            vector cvector = new vector(xc-vectors.get(i).getX(),yc-vectors.get(i).getY(),zc-vectors.get(i).getZ());
-            cvectors.add(i,cvector);
-        }
-        double totalmag = 0;
-        for(int i = 0; i < vectors.size(); i++) {
-            totalmag = totalmag + cvectors.get(i).magnitude();
-        }
-        double r = totalmag/vectors.size();
-        Log.i(TAG, "volume");
-        return ((8/(3*(Math.sqrt(3))))*r*r*r);
     }
 
     public double sumVectors(ArrayList<Double> mag){
@@ -300,7 +310,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         for(int x = 0; x<mag.size(); x++){
             sum = sum+mag.get(x);
         }
-        return sum;
+        return sum*4/2.56/100;
     }
 
     @Override
@@ -335,9 +345,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 final String rotationMsg = String.format(sRotationFormat,
                         pose.rotation[0], pose.rotation[1], pose.rotation[2],
                         pose.rotation[3]);
-                final String lengthMsg = "Total Length: "+sums;
-                final String areaMsg = "Total Area: "+area;
-                final String volumeMsg = "Total Volume: "+volume;
+                final String lengthMsg = "Total Length: "+sums+"m";
+                final String areaMsg = "Total Area: "+area+"m^2";
+                final String volumeMsg = "Total Volume: "+volume+"m^3";
 
 
                 a1 = pose.translation[0];
