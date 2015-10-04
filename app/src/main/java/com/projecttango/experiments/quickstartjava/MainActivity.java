@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,25 +45,53 @@ import java.util.ArrayList;
  * data to the LogCat. Also demonstrates Tango lifecycle management through
  * {@link TangoConfig}.
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String sTranslationFormat = "Translation: %f, %f, %f";
     private static final String sRotationFormat = "Rotation: %f, %f, %f, %f";
 
     private TextView mTranslationTextView;
     private TextView mRotationTextView;
+    private TextView mLength;
+    private TextView mArea;
+    private TextView mVolume;
+    private TextView mRecorded;
+    private double area;
+    private double volume;
+    private String PointsChosen="";
+    private double a1=0;
+    private double a2=0;
+    private double a3=0;
+    private double sums;
 
     private Tango mTango;
     private TangoConfig mConfig;
+    private TangoPoseData mTangoPoseData;
     private boolean mIsTangoServiceConnected;
     private boolean mIsProcessing = false;
+
+    ArrayList<vector> vectors = new ArrayList<vector>();
+    ArrayList<Double> magnitudes = new ArrayList<Double>();
+    int index = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+    //Setting textviews
         mTranslationTextView = (TextView) findViewById(R.id.translation_text_view);
         mRotationTextView = (TextView) findViewById(R.id.rotation_text_view);
+        mRecorded = (TextView) findViewById(R.id.recorded_points);
+        mLength = (TextView) findViewById(R.id.total_length);
+        mArea = (TextView) findViewById(R.id.total_area);
+        mVolume = (TextView) findViewById(R.id.total_volume);
+        //buttons!
+        findViewById(R.id.Finish_Record).setOnClickListener(this);
+        findViewById(R.id.total_length).setOnClickListener(this);
+        findViewById(R.id.total_area).setOnClickListener(this);
+        findViewById(R.id.total_volume).setOnClickListener(this);
+        findViewById(R.id.Record).setOnClickListener(this);
 
         // Instantiate Tango client
         mTango = new Tango(this);
@@ -72,6 +101,7 @@ public class MainActivity extends Activity {
         // like: mConfig.putBoolean(TangoConfig.KEY_BOOLEAN_DEPTH, true)
         mConfig = mTango.getConfig(TangoConfig.CONFIG_TYPE_CURRENT);
         mConfig.putBoolean(TangoConfig.KEY_BOOLEAN_MOTIONTRACKING, true);
+
 
     }
 
@@ -137,6 +167,61 @@ public class MainActivity extends Activity {
         }
     }
 
+    public void onClick(View v){
+        switch(v.getId()) {
+            //adds a point when the button is pressed
+            case R.id.Record:
+                index++;
+                vectors.add(new vector(a1, a2, a3));
+                PointsChosen = PointsChosen + "Vector" + index + ": " + vectors.get(index - 1).getX() + ", " + vectors.get(index - 1).getY() + ", " + vectors.get(index - 1).getZ() + "\n";
+                break;
+            //finishes the recording - Gets the length travelled
+            case R.id.Finish_Record:
+                for (int x = 0; x < vectors.size(); x++) {
+                    for (int y = x + 1; y < vectors.size(); y++) {
+                        magnitudes.add(Math.abs(vectors.get(x).magnitude() - vectors.get(y).magnitude()));
+                    }
+                }
+                sums = sumVectors(magnitudes);
+                break;
+            //Calculates the area
+            case R.id.total_area:
+                area = CalcArea(vectors, magnitudes);
+                break;
+            //Calculates the volume
+            case R.id.total_volume:
+                volume = CalcVolume(vectors, magnitudes);
+                break;
+            case R.id.Reset:
+                area = 0;
+                volume = 0;
+                sums = 0;
+                magnitudes = new ArrayList<Double>();
+                vectors = new ArrayList<vector>();
+                PointsChosen = "";
+                break;
+
+        }
+    }
+
+    public double CalcArea (ArrayList<vector> vectors, ArrayList<Double> mag){
+        return 0;
+        //calculate area
+    }
+
+    public double CalcVolume (ArrayList<vector> vectors, ArrayList<Double> mag){
+        return 0;
+        //calculate volume
+    }
+
+    public double sumVectors(ArrayList<Double> mag){
+        double sum = 0;
+        for(int x = 0; x<mag.size(); x++){
+            sum = sum+mag.get(x);
+        }
+        return sum;
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -169,6 +254,10 @@ public class MainActivity extends Activity {
                         pose.rotation[0], pose.rotation[1], pose.rotation[2],
                         pose.rotation[3]);
 
+                a1 = pose.translation[0];
+                a2 = pose.translation[1];
+                a3 = pose.translation[2];
+
                 // Output to LogCat
                 String logMsg = translationMsg + " | " + rotationMsg;
                 Log.i(TAG, logMsg);
@@ -183,6 +272,10 @@ public class MainActivity extends Activity {
                     public void run() {
                         mTranslationTextView.setText(translationMsg);
                         mRotationTextView.setText(rotationMsg);
+                        mRecorded.setText(PointsChosen);
+                        mLength.setText("Total Length Traveled: "+sums);
+                        mArea.setText("Total Area: "+area);
+                        mVolume.setText("Total Volume: "+volume);
                         mIsProcessing = false;
                     }
                 });
