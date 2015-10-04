@@ -63,6 +63,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private double a2=0;
     private double a3=0;
     private double sums;
+    private boolean takedata=true;
 
     private Tango mTango;
     private TangoConfig mConfig;
@@ -183,81 +184,75 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                 }
                 sums = sumVectors(magnitudes);
+                takedata=false;
+                Log.i("click", "length");
                 break;
             //Calculates the area
             case R.id.total_area:
                 area = CalcArea(vectors, magnitudes);
+                Log.i("click", "area");
                 break;
             //Calculates the volume
             case R.id.total_volume:
                 volume = CalcVolume(vectors);
+                Log.i("click", "volume");
                 break;
             case R.id.Reset:
+                Log.i("click", "reset");
                 area = 0;
                 volume = 0;
                 sums = 0;
                 magnitudes = new ArrayList<Double>();
                 vectors = new ArrayList<vector>();
                 PointsChosen = "";
+                takedata = true;
                 break;
 
         }
     }
 
-        public double distance(vector a, vector b, vector c){
-            double xy = Math.sqrt(Math.pow(a.getX() - b.getX(), 2) +
-                    Math.pow(a.getY() - b.getY(), 2));
-            double xz = Math.sqrt(Math.pow(a.getX() - b.getX(), 2) +
-                    Math.pow(a.getZ() - b.getZ(), 2));
-            double yz = Math.sqrt(Math.pow(a.getY() - b.getY(), 2) +
-                    Math.pow(a.getZ() - b.getZ(), 2));
-            if (xy > xz && xy > yz) {
-                return xy;
-            }
-            if (yz > xy && yz > xz) {
-                return yz;
-            } else {
-                return xz;
-            }
+        public double distance(vector a, vector b){
+            double xyz = Math.sqrt(Math.pow(a.getX() - b.getX(), 2) +
+                    Math.pow(a.getY() - b.getY(), 2)) + Math.pow(a.getZ()-b.getZ(),2);
+            return xyz;
         }
 
 
-        public void CalcArea(ArrayList <vector> q, ArrayList <Double> p){
+        public double CalcArea(ArrayList <vector> q, ArrayList <Double> p){
             double area;
-            for (int i = 0; i < q.size(); i++) {
-                if (q.size() == 1) {
-                    area = 0;
-                }
-                if (q.size() == 2) {
-                    area = 0;
-                }
-                if (q.size() == 3) {
-                    double tot = distance(q.get(0), q.get(1)) + distance(q.get(1), q.get(2))
-                            + distance(q.get(0), q.get(2));
-                    double her = tot / 2;
-                    area = Math.sqrt(her * (her - distance(q.get(0), q.get(1))) *
-                            (her - distance(q.get(1), q.get(2))) * her - distance(q.get(0), q.get(2)));
-                } else {
-                    int num = q.size() - 2;
-                    double tot = 0;
-                    double sum = 0;
-                    ArrayList<Double> totalarea = new ArrayList<Double>();
-                    for (int r = 0; r < q.size(); i++) {
-                        tot = distance(q.get(0), q.get(1)) + distance(q.get(0), q.get(r = r + 1)) +
-                                distance(q.get(r), q.get(r + 1));
-                        double her = tot / 2;
-                        area = Math.sqrt(her * (her - distance(q.get(0), q.get(1)) *
-                                (her - distance(q.get(1), q.get(2))) * her - distance(q.get(0), q.get(2))));
-                        totalarea.add(area);
-                    }
-                    for (int x = 0; x < q.size(); i++) {
-                        sum = sum + totalarea.get(i);
-                    }
-
-
-                }
-
+            if (q.size() == 1) {
+                  return 0;
             }
+            else if (q.size() == 2) {
+                return 0;
+            }
+            else if (q.size() == 3) {
+                double tot = distance(q.get(0), q.get(1)) + distance(q.get(1), q.get(2))
+                            + distance(q.get(0), q.get(2));
+                double her = tot / 2;
+                area = Math.sqrt(her * (her - distance(q.get(0), q.get(1))) *
+                            (her - distance(q.get(1), q.get(2))) * her - distance(q.get(0), q.get(2)));
+            }
+            else {
+                int num = q.size() - 2;
+                double tot = 0;
+                double sum = 0;
+                ArrayList<Double> totalarea = new ArrayList<Double>();
+                for (int r = 0; r < num; r++) {
+                    tot = distance(q.get(0), q.get(r)) + distance(q.get(0), q.get(r + 1)) +
+                            distance(q.get(r), q.get(r + 1));
+                    double her = tot / 2;
+                    area = Math.sqrt(her * (her - distance(q.get(0), q.get(r)) *
+                                (her - distance(q.get(0), q.get(r + 1))) * her - distance(q.get(r), q.get(r + 1))));
+                    totalarea.add(area);
+                }
+                for (int x = 0; x < q.size(); x++) {
+                    sum = sum + totalarea.get(x);
+                }
+                area = sum;
+            }
+            Log.i(TAG, "Area");
+            return area;
         }
 
 
@@ -287,6 +282,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             totalmag = totalmag + cvectors.get(i).magnitude();
         }
         double r = totalmag/vectors.size();
+        Log.i(TAG, "volume");
         return ((8/(3*(Math.sqrt(3))))*r*r*r);
     }
 
@@ -323,12 +319,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 mIsProcessing = true;
                 
                 // Format Translation and Rotation data
+
                 final String translationMsg = String.format(sTranslationFormat,
                         pose.translation[0], pose.translation[1],
                         pose.translation[2]);
                 final String rotationMsg = String.format(sRotationFormat,
                         pose.rotation[0], pose.rotation[1], pose.rotation[2],
                         pose.rotation[3]);
+                final String lengthMsg = "Total Length: "+sums;
+                final String areaMsg = "Total Area: "+area;
+                final String volumeMsg = "Total Volume: "+volume;
+
 
                 a1 = pose.translation[0];
                 a2 = pose.translation[1];
@@ -346,12 +347,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mTranslationTextView.setText(translationMsg);
-                        mRotationTextView.setText(rotationMsg);
+                        if (takedata){
+                            mTranslationTextView.setText(translationMsg);
+                            mRotationTextView.setText(rotationMsg);
+                        }
                         mRecorded.setText(PointsChosen);
-                        mLength.setText("Total Length Traveled: "+sums);
-                        mArea.setText("Total Area: "+area);
-                        mVolume.setText("Total Volume: "+volume);
+                        mLength.setText(lengthMsg);
+                        mArea.setText(areaMsg);
+                        mVolume.setText(volumeMsg);
                         mIsProcessing = false;
                     }
                 });
